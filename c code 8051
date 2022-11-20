@@ -1,0 +1,99 @@
+
+/*
+**************************************************************************************************************
+AUTHOR: PUSHKAL AGARWAL
+ROLL NUMBER:	2001034
+INSTITUTE:	INDIAN INSTITUTE OF INFORMATION TECHNOLOGY, BHAGALPUR
+DEPARTMENT:	ELECTRONICS AND COMMUNICATION ENGINEERING
+DATE:	20-11-2022
+
+**************************************************************************************************************
+*/
+
+#include <reg51.h>
+#define port P0;
+int choose_7seg = 0;
+sbit x = P2^0;
+sbit y = P2^1;
+sbit z = P2^2;
+int min1 = 0, min0 = 0, sec1 = 0, sec0 = 0;
+char arr[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0X6D, 0x7D, 0x07, 0x7F, 0x6F}; // character array for 7-segment.
+void delay();
+
+void main()
+{
+
+	
+	for (min1; min1 < 6; min1++)		// for  setting up the minutes( ten's digit)
+	{
+		for (min0; min0 < 10; min0++)		// for setting up the minutes(one's digit)
+		{
+			for (sec1; sec1 < 6; sec1++)	// for setting up the seconds (ten's digit)
+			{
+				for (sec0; sec0 < 1000; sec0++) // for setting up the seconds (one's digit)
+				{
+					delay();
+				}
+			}
+		}
+	}
+}
+void delay()
+{
+	TMOD = 0X01;	// setting up the timer mode register.
+	TH0 = 0XFC;		// pushing the values in the higher bits of timer-0 register.
+	TL0 = 0X67;		// pushing the timer values in the lower bits of timer-0 register.
+	TR0 = 1;			// start the timer.
+	while (TF0 == 0)
+	{
+		// TR0 = 0;  timer off 
+		TF0 = 0;
+	choose_7seg++;
+	choose_7seg = choose_7seg % 4;
+
+	switch (choose_7seg) 
+	{
+	case 0:
+	{
+		P0 = arr[min1];
+		// x = 0;  for 3 : 8 decoder, when hours are also to be displayed.
+		y = 1;
+		z = 1;
+		break;
+	}
+	case 1:
+	{
+		P0 = arr[min0];
+		// x = 0;
+		y = 1;
+		z = 0;
+		break;
+
+	}
+	case 2:
+	{
+		P0 = arr[sec1];
+		// x = 0;
+		y = 0;
+		z = 1;
+		break;
+	}
+	case 3:
+	{
+		P0 = arr[(sec0 % 10)];
+		// x = 0;
+		y = 0;
+		z = 0;
+		break;
+	}						// case ends.
+	}						// switch ends. 
+	}						// while loop ends.
+	TR0=0;
+}					// delay function ends.
+
+/*
+***************************************************************************************************************
+* This code is written to display minutes and hours using a 2:4 decoder and 4x7-segment displays and a 8051 
+* mico-controller.
+***************************************************************************************************************
+*/
